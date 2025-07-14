@@ -1,231 +1,128 @@
-# Go-Insight Go SDK
+# Go-Insight Go SDK Documentation
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/NathanSanchezDev/go-insight-go-sdk.svg)](https://pkg.go.dev/github.com/NathanSanchezDev/go-insight-go-sdk)
-[![Go Report Card](https://goreportcard.com/badge/github.com/NathanSanchezDev/go-insight-go-sdk)](https://goreportcard.com/report/github.com/NathanSanchezDev/go-insight-go-sdk)
+Welcome to the comprehensive documentation for the Go-Insight Go SDK.
 
-Official Go SDK for [Go-Insight](https://github.com/NathanSanchezDev/go-insight) observability platform.
+## Table of Contents
 
-## Features
+- [Quick Start Guide](quick-start.md)
+- [API Reference](api-reference.md)
+- [Framework Integration](framework-integration.md)
+- [Advanced Usage](advanced-usage.md)
+- [Best Practices](best-practices.md)
+- [Performance Guide](performance.md)
+- [Troubleshooting](troubleshooting.md)
+- [Migration Guide](migration.md)
 
-- 🚀 **Zero Configuration** - Add one line, get full observability
-- 🔗 **Automatic Correlation** - Traces, spans, and logs automatically linked  
-- 📊 **Smart Metrics** - HTTP performance automatically tracked
-- 🛡️ **Error Handling** - Graceful failures, non-blocking operations
-- ⚡ **High Performance** - Async operations, minimal overhead
-- 🎯 **Framework Support** - Gin, Echo middleware included
+## Overview
 
-## Installation
+The Go-Insight Go SDK provides zero-configuration observability for Go applications. With just one line of middleware, you get:
 
-```bash
-go get github.com/NathanSanchezDev/go-insight-go-sdk
-```
+- **Automatic request tracing** with distributed trace correlation
+- **Performance metrics collection** for all HTTP endpoints
+- **Structured logging** with trace context
+- **Custom instrumentation** for business logic
+- **Framework integration** for Gin and Echo
 
-## Quick Start
-
-### Basic Setup
-
-```go
-package main
-
-import (
-    "github.com/gin-gonic/gin"
-    "github.com/NathanSanchezDev/go-insight-go-sdk/goinsight"
-)
-
-func main() {
-    // Initialize Go-Insight client
-    client := goinsight.New(goinsight.Config{
-        APIKey:      "your-api-key",
-        Endpoint:    "http://localhost:8080",
-        ServiceName: "my-go-service",
-    })
-
-    // Setup Gin with auto-instrumentation
-    r := gin.Default()
-    r.Use(client.GinMiddleware())
-
-    // Your routes are automatically instrumented!
-    r.GET("/users", func(c *gin.Context) {
-        // Manual logging with automatic trace correlation
-        client.LogInfo(c.Request.Context(), "Fetching users", map[string]interface{}{
-            "user_count": 42,
-        })
-
-        c.JSON(200, gin.H{"users": []string{}})
-    })
-
-    r.Run(":8080")
-}
-```
-
-## Framework Support
+## Quick Examples
 
 ### Gin Framework
-
 ```go
+import "github.com/NathanSanchezDev/go-insight-go-sdk/goinsight"
+
+client := goinsight.New(goinsight.Config{
+    APIKey:      "your-api-key",
+    Endpoint:    "http://localhost:8080",
+    ServiceName: "my-service",
+})
+
 r := gin.Default()
-r.Use(client.GinMiddleware())
+r.Use(client.GinMiddleware()) // One line for full observability!
 ```
 
-### Echo Framework
-
+### Manual Instrumentation
 ```go
-import "github.com/labstack/echo/v4"
-
-e := echo.New()
-e.Use(client.EchoMiddleware())
-```
-
-## Manual Instrumentation
-
-### Custom Spans
-
-```go
-func processUser(ctx context.Context, client *goinsight.Client, userID string) error {
-    // Start a span for this operation
-    spanCtx, err := client.StartSpan(ctx, "process_user")
-    if err != nil {
-        return err
-    }
-    defer client.FinishSpan(spanCtx)
-
+// Wrap any function with automatic instrumentation
+processData := client.Instrument("process_data", func(ctx context.Context) error {
     // Your business logic here
-    client.LogInfo(spanCtx, "Processing user", map[string]interface{}{
-        "user_id": userID,
-    })
-
-    return nil
-}
-```
-
-### Function Decoration
-
-```go
-// Wrap function with automatic instrumentation
-instrumentedFn := client.Instrument("database_query", func(ctx context.Context) error {
-    // Your database logic here
-    time.Sleep(50 * time.Millisecond)
+    client.LogInfo(ctx, "Processing completed")
     return nil
 })
 
-// Call instrumented function
-err := instrumentedFn(ctx)
+err := processData(ctx)
 ```
 
-## Configuration
+## Key Features
 
-### Environment Variables
+### 🚀 Zero Configuration
+Add one line of middleware and get complete observability without any additional setup.
 
-```bash
-GO_INSIGHT_API_KEY=your-api-key
-GO_INSIGHT_ENDPOINT=http://localhost:8080
-GO_INSIGHT_SERVICE_NAME=my-service
-```
+### 🔗 Automatic Correlation
+All logs, metrics, and traces are automatically correlated using distributed tracing context.
 
-### Programmatic Configuration
+### ⚡ High Performance
+- Sub-millisecond overhead per request
+- Asynchronous operations that don't block your application
+- Efficient connection pooling and batching
 
-```go
-config := goinsight.Config{
-    APIKey:      "your-api-key",           // Required
-    Endpoint:    "http://localhost:8080",  // Required
-    ServiceName: "my-service",             // Required
-    Timeout:     10 * time.Second,         // Optional, default: 5s
-}
+### 🛡️ Production Ready
+- Graceful error handling that never breaks your app
+- Configurable timeouts and retry logic
+- Comprehensive test coverage
 
-client := goinsight.New(config)
-```
+### 🎯 Framework Support
+Built-in middleware for popular Go web frameworks:
+- Gin (v1.9.1+)
+- Echo (v4.11.3+)
+- Custom HTTP handlers
 
-## API Reference
+## Getting Started
 
-### Logging
+1. **Install the SDK**
+   ```bash
+   go get github.com/NathanSanchezDev/go-insight-go-sdk
+   ```
 
-```go
-// Different log levels
-client.LogInfo(ctx, "Info message", metadata)
-client.LogWarn(ctx, "Warning message", metadata)
-client.LogError(ctx, "Error message", err, metadata)
-client.LogDebug(ctx, "Debug message", metadata)
+2. **Initialize the client**
+   ```go
+   client := goinsight.New(goinsight.Config{
+       APIKey:      "your-api-key",
+       Endpoint:    "http://localhost:8080",
+       ServiceName: "my-service",
+   })
+   ```
 
-// Generic log method
-client.Log(ctx, "INFO", "Custom message", metadata)
-```
+3. **Add middleware** (for web frameworks)
+   ```go
+   r.Use(client.GinMiddleware())
+   ```
 
-### Metrics
+4. **Start observing** your application automatically!
 
-```go
-metric := goinsight.Metric{
-    Path:        "/api/users",
-    Method:      "GET",
-    StatusCode:  200,
-    Duration:    45.7,
-    Source: goinsight.MetricSource{
-        Language:  "go",
-        Framework: "gin",
-        Version:   "1.9.1",
-    },
-    Metadata: map[string]interface{}{
-        "cache_hit": true,
-    },
-}
+## Documentation Structure
 
-client.SendMetric(metric)
-```
+### For Beginners
+- Start with the [Quick Start Guide](quick-start.md)
+- Check out [Framework Integration](framework-integration.md) for your web framework
 
-### Distributed Tracing
+### For Advanced Users
+- [Advanced Usage](advanced-usage.md) for custom instrumentation
+- [Performance Guide](performance.md) for optimization tips
+- [Best Practices](best-practices.md) for production deployments
 
-```go
-// Start a new trace
-ctx, traceCtx, err := client.StartTrace(context.Background(), "user_request")
-if err == nil {
-    defer client.FinishTrace(ctx)
-    
-    // Start spans within the trace
-    spanCtx, err := client.StartSpan(ctx, "database_query")
-    if err == nil {
-        defer client.FinishSpan(spanCtx)
-        
-        // Your instrumented code here
-    }
-}
-```
-
-## Examples
-
-Check out the [examples directory](examples/) for complete working examples:
-
-- [Gin Example](examples/gin-example/) - Complete Gin web server with auto-instrumentation
-- [Echo Example](examples/echo-example/) - Echo framework integration
-- [Manual Instrumentation](examples/manual-instrumentation/) - Custom tracing and logging
-
-## Best Practices
-
-1. **Service Naming**: Use consistent service names across environments
-2. **Error Handling**: Always handle SDK errors gracefully - they should never break your app
-3. **Async Operations**: SDK operations are async by default for performance
-4. **Trace Context**: Pass context between functions to maintain trace correlation
-5. **Metadata**: Include relevant metadata for better observability
-
-## Performance
-
-- **Non-blocking**: All operations are asynchronous and won't block your application
-- **Minimal Overhead**: < 1ms overhead per instrumented request
-- **Connection Pooling**: Efficient HTTP client with connection reuse
-- **Graceful Failures**: SDK errors never affect your application logic
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### For Contributors
+- [API Reference](api-reference.md) for complete method documentation
+- [Troubleshooting](troubleshooting.md) for common issues
 
 ## Support
 
-- 📖 [Documentation](https://github.com/NathanSanchezDev/go-insight/docs)
 - 🐛 [Issue Tracker](https://github.com/NathanSanchezDev/go-insight-go-sdk/issues)
 - 💬 [Discussions](https://github.com/NathanSanchezDev/go-insight-go-sdk/discussions)
+- 📖 [Main Go-Insight Documentation](https://github.com/NathanSanchezDev/go-insight)
 
----
+## Contributing
 
-Made with ❤️ for the Go community
+We welcome contributions! Please see our [Contributing Guide](../CONTRIBUTING.md) for details.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
