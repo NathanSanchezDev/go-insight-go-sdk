@@ -1,7 +1,9 @@
-# Go-Insight Go SDK
-
 [![Go Reference](https://pkg.go.dev/badge/github.com/NathanSanchezDev/go-insight-go-sdk.svg)](https://pkg.go.dev/github.com/NathanSanchezDev/go-insight-go-sdk)
 [![Go Report Card](https://goreportcard.com/badge/github.com/NathanSanchezDev/go-insight-go-sdk)](https://goreportcard.com/report/github.com/NathanSanchezDev/go-insight-go-sdk)
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c193fadf-1508-4fde-881e-b8753380cbc7" alt="Go-Insight Logo" width="400" height="400">
+</p>
 
 Official Go SDK for [Go-Insight](https://github.com/NathanSanchezDev/go-insight) observability platform.
 
